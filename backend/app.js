@@ -13,8 +13,9 @@ const app = express();
 app.use(
   cors({
     origin: [
+      
       "http://localhost:5173",
-      process.env.FRONTEND_URL
+      "https://hitesh-restro.vercel.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
