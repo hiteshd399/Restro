@@ -11,7 +11,7 @@ dbConnection();
 
 // Enable CORS (IMPORTANT)
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend
+  origin: "https://hitesh-restro.vercel.app", // your frontend
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
