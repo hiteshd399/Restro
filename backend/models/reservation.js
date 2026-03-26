@@ -1,38 +1,45 @@
-import mongoose from "mongoose";
-import validator from "validator";
+import mongoose from 'mongoose';
 
 const reservationSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-    minLength: [3, "First name must be of at least 3 Characters."],
-    maxLength: [30, "First name cannot exceed 30 Characters."],
+    trim: true
   },
   lastName: {
     type: String,
     required: true,
-    minLength: [3, "Last name must be of at least 3 Characters."],
-    maxLength: [30, "Last name cannot exceed 30 Characters."],
-  },
-  date: {
-    type: String,
-    required: true,
-  },
-  time: {
-    type: String,
-    required: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
-    validate: [validator.isEmail, "Provide a valid email"],
+    lowercase: true,
+    trim: true
   },
   phone: {
     type: String,
     required: true,
-    minLength: [10, "Phone number must contain 10 Digits."],
-    maxLength: [10, "Phone number must contain 10 Digits."],
+    trim: true
   },
+  date: {
+    type: String,
+    required: true
+  },
+  time: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'cancelled'],
+    default: 'pending'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-export const Reservation = mongoose.model("Reservation", reservationSchema);
+const Reservation = mongoose.model('Reservation', reservationSchema);
+export default Reservation;

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { HiOutlineArrowNarrowRight } from "react-icons/hi";
 import axios from "axios";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -10,43 +11,32 @@ const Reservation = () => {
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [phone, setPhone] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState();
   const navigate = useNavigate();
 
   const handleReservation = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
       const { data } = await axios.post(
-        `https://restro-ikl4.onrender.com/api/v1/reservation/send`,
+        "https://your-backend-url.onrender.com/api/v1/reservation",
+        { firstName, lastName, email, phone, date, time },
         {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phone: phone,
-          date: date,
-          time: time,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
         }
       );
-
       toast.success(data.message);
       setFirstName("");
       setLastName("");
-      setPhone("");
+      setPhone(0);
       setEmail("");
       setTime("");
       setDate("");
       navigate("/success");
     } catch (error) {
-      console.error("Error:", error.response?.data);
-      toast.error(error?.response?.data?.message || "Something went wrong!");
-    } finally {
-      setLoading(false);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -60,21 +50,19 @@ const Reservation = () => {
           <div className="reservation_form_box">
             <h1>MAKE A RESERVATION</h1>
             <p>For Further Questions, Please Call</p>
-            <form onSubmit={handleReservation}>
+            <form>
               <div>
                 <input
                   type="text"
                   placeholder="First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  required
                 />
                 <input
                   type="text"
                   placeholder="Last Name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  required
                 />
               </div>
               <div>
@@ -83,14 +71,12 @@ const Reservation = () => {
                   placeholder="Date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  required
                 />
                 <input
                   type="time"
                   placeholder="Time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  required
                 />
               </div>
               <div>
@@ -100,18 +86,16 @@ const Reservation = () => {
                   className="email_tag"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                 />
                 <input
-                  type="tel"
+                  type="number"
                   placeholder="Phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  required
                 />
               </div>
-              <button type="submit" disabled={loading}>
-                {loading ? "RESERVING..." : "RESERVE NOW"}
+              <button type="submit" onClick={handleReservation}>
+                RESERVE NOW{" "}
                 <span>
                   <HiOutlineArrowNarrowRight />
                 </span>
