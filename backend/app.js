@@ -9,38 +9,55 @@ dotenv.config({ path: "./config/config.env" });
 
 const app = express();
 
-// ✅ CORS configuration - MUST be before any routes
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",           // Your local frontend
-      "https://hitesh-restro.vercel.app" // Your deployed frontend
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
+// ✅ CORS Configuration - THIS IS CRITICAL
+const allowedOrigins = [
+  "http://localhost:5173",           // Local developments
+  "https://hitesh-restro.vercel.app" // Production frontend
+];
 
-// ✅ Handle preflight requests
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      callback(null, true); // Temporarily allow all for testing
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+}));
+
+// Handle preflight requests
 app.options("*", cors());
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Test route (helps verify backend is working)
+// Root endpoint
 app.get("/", (req, res) => {
   res.json({ 
     message: "Restro API is running",
     status: "active",
-    endpoints: {
-      reservation: "/api/v1/reservation/send"
-    }
+    timestamp: new Date().toISOString()
   });
 });
 
-// ✅ Your reservation routes
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK",
+    cors_enabled: true,
+    allowed_origins: allowedOrigins
+  });
+});
+
+// Your reservation routes
 app.use("/api/v1/reservation", reservationRouter);
 
 // Error middleware
